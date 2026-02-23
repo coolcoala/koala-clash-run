@@ -20,7 +20,7 @@ var (
 	mbOk            = uintptr(0)
 	mbIconError     = uintptr(0x10)
 	messageBoxFlags = mbOk | mbIconError
-	messageBoxTitle = "Sparkle Runner"
+	messageBoxTitle = "Koala Clash Runner"
 	paramFileName   = "param.txt"
 )
 
@@ -53,7 +53,7 @@ func run() error {
 	cmd := exec.Command(args[1], content)
 	err = cmd.Start()
 	if err != nil {
-		errorMessage := "Failed to start program\n" + args[1] + "\n" + err.Error() + "\n请尝试以管理员权限启动软件"
+		errorMessage := "Failed to start program\n" + args[1] + "\n" + err.Error() + "\nPlease try launching the software with administrator privileges"
 		return errors.New(errorMessage)
 	}
 
