@@ -50,7 +50,7 @@ func run() error {
 	}
 	content := strings.TrimSpace(string(contentBytes))
 
-	if inSharedJob() && startViaWMI(syscall.EscapeArg(args[1])+" "+syscall.EscapeArg(content)) == nil {
+	if inJob() && startViaWMI(syscall.EscapeArg(args[1])+" "+syscall.EscapeArg(content)) == nil {
 		return nil
 	}
 

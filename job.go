@@ -13,18 +13,19 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-// inSharedJob reports whether this process shares its job object with other processes.
+var procIsProcessInJob = windows.NewLazySystemDLL("kernel32.dll").NewProc("IsProcessInJob")
+
+// inJob reports whether this process runs in any job object.
 // Task Scheduler puts every task it starts into the job of the tasks that are still running.
 // If one of them belongs to an MSIX package (e.g. Office's opushutil.exe), the job is the
 // package's job, and Windows terminates it when the package gets disabled during an update.
-func inSharedJob() bool {
-	var info struct { // JOBOBJECT_BASIC_ACCOUNTING_INFORMATION
-		Times                                                   [4]int64
-		PageFaults, TotalProcesses, ActiveProcesses, Terminated uint32
-	}
-	err := windows.QueryInformationJobObject(0, windows.JobObjectBasicAccountingInformation,
-		uintptr(unsafe.Pointer(&info)), uint32(unsafe.Sizeof(info)), nil)
-	return err == nil && info.ActiveProcesses > 1
+// Counting the processes in the job would see only the immediate job and only at this moment,
+// and Koala gains nothing from any job, so it leaves whichever one it was started in.
+func inJob() bool {
+	var result int32
+	ok, _, _ := procIsProcessInJob.Call(uintptr(windows.CurrentProcess()), 0,
+		uintptr(unsafe.Pointer(&result)))
+	return ok != 0 && result != 0
 }
 
 // startViaWMI starts cmdline through Win32_Process.Create: the process is created by the WMI
