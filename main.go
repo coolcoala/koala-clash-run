@@ -50,6 +50,10 @@ func run() error {
 	}
 	content := strings.TrimSpace(string(contentBytes))
 
+	if inSharedJob() && startViaWMI(syscall.EscapeArg(args[1])+" "+syscall.EscapeArg(content)) == nil {
+		return nil
+	}
+
 	cmd := exec.Command(args[1], content)
 	err = cmd.Start()
 	if err != nil {
